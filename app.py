@@ -1,6 +1,8 @@
 import streamlit as st
 from datetime import datetime, timedelta
+import streamlit.components.v1 as components
 import html
+import json
 
 # Page Config
 st.set_page_config(
@@ -145,37 +147,16 @@ st.markdown("""
         font-size: 0.84rem !important;
     }
 
-    .copy-btn {
-        background: linear-gradient(135deg, #1e6fbf, #2a8cde);
-        color: white;
-        border: none;
-        padding: 8px 18px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-family: 'Sarabun', sans-serif;
-        font-size: 0.86rem;
-        font-weight: 600;
-        margin-top: 8px;
-        transition: all 0.2s;
-        width: 100%;
-    }
-
-    .copy-btn:hover {
-        background: linear-gradient(135deg, #2a8cde, #3da0f5);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(45, 140, 222, 0.4);
+    div[data-testid="stExpander"] {
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        border-radius: 8px !important;
+        background: rgba(255,255,255,0.03) !important;
     }
 
     hr {
         margin-top: 0.4rem !important;
         margin-bottom: 0.4rem !important;
         border-color: rgba(255,255,255,0.1) !important;
-    }
-
-    div[data-testid="stExpander"] {
-        border: 1px solid rgba(255,255,255,0.12) !important;
-        border-radius: 8px !important;
-        background: rgba(255,255,255,0.03) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -294,13 +275,7 @@ if remark.strip():
     message += f"\n\nหมายเหตุ: {remark.strip()}"
 
 safe_message_html = html.escape(message)
-
-safe_message_js = (
-    message
-    .replace("\\", "\\\\")
-    .replace("`", "\\`")
-    .replace("${", "\\${")
-)
+message_json = json.dumps(message, ensure_ascii=False)
 
 # Output
 st.markdown('<div class="output-label">ข้อความที่จะส่ง</div>', unsafe_allow_html=True)
@@ -310,14 +285,62 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown(f"""
-<button class="copy-btn" onclick="
-    navigator.clipboard.writeText(`{safe_message_js}`).then(() => {{
-        this.textContent = 'คัดลอกแล้ว';
-        setTimeout(() => this.textContent = 'คัดลอกข้อความ', 2000);
-    }});
-">คัดลอกข้อความ</button>
-""", unsafe_allow_html=True)
+# Copy Button
+components.html(f"""
+<button id="copyBtn" style="
+    background: linear-gradient(135deg, #1e6fbf, #2a8cde);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: Sarabun, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%;
+    height: 38px;
+">
+คัดลอกข้อความ
+</button>
+
+<script>
+const textToCopy = {message_json};
+
+document.getElementById("copyBtn").addEventListener("click", async function() {{
+    const btn = this;
+
+    try {{
+        await navigator.clipboard.writeText(textToCopy);
+        btn.innerText = "คัดลอกแล้ว";
+        setTimeout(() => {{
+            btn.innerText = "คัดลอกข้อความ";
+        }}, 2000);
+    }} catch (err) {{
+        const textarea = document.createElement("textarea");
+        textarea.value = textToCopy;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        textarea.style.top = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {{
+            document.execCommand("copy");
+            btn.innerText = "คัดลอกแล้ว";
+        }} catch (e) {{
+            btn.innerText = "กด Ctrl+C เพื่อคัดลอก";
+        }}
+
+        document.body.removeChild(textarea);
+
+        setTimeout(() => {{
+            btn.innerText = "คัดลอกข้อความ";
+        }}, 2000);
+    }}
+}});
+</script>
+""", height=48)
 
 with st.expander("คัดลอกแบบ manual"):
     st.text_area(
