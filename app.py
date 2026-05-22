@@ -23,7 +23,7 @@ st.markdown("""
     }
 
     .block-container {
-        padding-top: 1rem !important;
+        padding-top: 2rem !important;
         padding-bottom: 1rem !important;
         padding-left: 1.2rem !important;
         padding-right: 1.2rem !important;
@@ -86,11 +86,11 @@ st.markdown("""
     }
 
     .output-label {
-        color:#7db9e8;
-        font-weight:700;
-        font-size:0.78rem;
-        text-transform:uppercase;
-        letter-spacing:1px;
+        color: #7db9e8;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         margin: 4px 0 6px 0;
     }
 
@@ -182,25 +182,14 @@ st.markdown("""
 
 # Date Calculation
 today_th = datetime.utcnow() + timedelta(hours=7)
-session_date = today_th - timedelta(days=1)
 
 def thai_date(dt):
     return dt.strftime(f"%d/%m/{dt.year + 543}")
 
-session_date_str = thai_date(session_date)
 today_str = thai_date(today_th)
 
-# Header
-st.markdown(f"""
-<div class="header-box">
-    <h1>ฟอร์มแจ้ง Call Margin</h1>
-    <div class="date-badge">
-        Session: <strong>{session_date_str}</strong>
-        &nbsp;|&nbsp;
-        วันนี้: {today_str}
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# Header placeholder
+header_placeholder = st.empty()
 
 # Main Form
 st.markdown('<div class="section-card"><div class="section-title">ข้อมูลหลัก</div>', unsafe_allow_html=True)
@@ -210,9 +199,29 @@ col1, col2, col3 = st.columns([1.25, 0.9, 1.1])
 with col1:
     session = st.selectbox(
         "Session",
-        options=["ก่อนปิดตลาด", "เปิดตลาด", "กลางวัน"],
+        options=["ก่อนปิดตลาด", "เปิดตลาด"],
         index=0
     )
+
+# Session Date Logic
+if session == "เปิดตลาด":
+    session_date = today_th
+else:
+    session_date = today_th - timedelta(days=1)
+
+session_date_str = thai_date(session_date)
+
+# Header
+header_placeholder.markdown(f"""
+<div class="header-box">
+    <h1>ฟอร์มแจ้ง Call Margin</h1>
+    <div class="date-badge">
+        Session: <strong>{session_date_str}</strong>
+        &nbsp;|&nbsp;
+        วันนี้: {today_str}
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 with col2:
     currency = st.selectbox(
@@ -263,6 +272,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 # Generate Message
 t_labels = []
+
 if t:
     t_labels.append("T")
 if t1:
@@ -294,7 +304,11 @@ safe_message_js = (
 
 # Output
 st.markdown('<div class="output-label">ข้อความที่จะส่ง</div>', unsafe_allow_html=True)
-st.markdown(f'<div class="output-box">{safe_message_html}</div>', unsafe_allow_html=True)
+
+st.markdown(
+    f'<div class="output-box">{safe_message_html}</div>',
+    unsafe_allow_html=True
+)
 
 st.markdown(f"""
 <button class="copy-btn" onclick="
