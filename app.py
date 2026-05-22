@@ -1,14 +1,15 @@
 import streamlit as st
 from datetime import datetime, timedelta
+import html
 
-# ── Page Config ──────────────────────────────────────────
+# Page Config
 st.set_page_config(
-    page_title="📋 ฟอร์มแจ้ง Call Margin",
-    page_icon="📋",
+    page_title="ฟอร์มแจ้ง Call Margin",
+    page_icon=None,
     layout="centered",
 )
 
-# ── Custom CSS ────────────────────────────────────────────
+# Custom CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
@@ -17,115 +18,146 @@ st.markdown("""
         font-family: 'Sarabun', sans-serif;
     }
 
-    .main {
-        background: linear-gradient(135deg, #0f1923 0%, #1a2d3d 50%, #0f1923 100%);
-        min-height: 100vh;
-    }
-
     .stApp {
         background: linear-gradient(135deg, #0f1923 0%, #1a2d3d 50%, #0f1923 100%);
+    }
+
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+        max-width: 760px !important;
+    }
+
+    div[data-testid="stVerticalBlock"] {
+        gap: 0.45rem !important;
+    }
+
+    div[data-testid="stHorizontalBlock"] {
+        gap: 0.6rem !important;
     }
 
     .header-box {
         background: linear-gradient(135deg, #1e3a5f, #2a5298);
         border: 1px solid #3d7abf;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 20px rgba(45, 120, 210, 0.3);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 16px rgba(45, 120, 210, 0.25);
     }
 
     .header-box h1 {
         color: #e8f4fd;
         margin: 0;
-        font-size: 1.6rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.3px;
     }
 
     .date-badge {
         background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 20px;
-        padding: 4px 14px;
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 999px;
+        padding: 3px 10px;
         color: #a8d4f5;
-        font-size: 0.85rem;
+        font-size: 0.78rem;
         display: inline-block;
-        margin-top: 8px;
+        margin-top: 6px;
     }
 
     .section-card {
         background: rgba(255,255,255,0.04);
         border: 1px solid rgba(255,255,255,0.1);
         border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 16px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
     }
 
     .section-title {
         color: #7db9e8;
-        font-size: 0.78rem;
-        font-weight: 600;
+        font-size: 0.72rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-bottom: 12px;
-        border-bottom: 1px solid rgba(125, 185, 232, 0.2);
-        padding-bottom: 6px;
+        letter-spacing: 1.2px;
+        margin-bottom: 6px;
+        border-bottom: 1px solid rgba(125, 185, 232, 0.18);
+        padding-bottom: 4px;
+    }
+
+    .output-label {
+        color:#7db9e8;
+        font-weight:700;
+        font-size:0.78rem;
+        text-transform:uppercase;
+        letter-spacing:1px;
+        margin: 4px 0 6px 0;
     }
 
     .output-box {
         background: rgba(20, 50, 80, 0.6);
         border: 1px solid #3d7abf;
         border-radius: 10px;
-        padding: 20px;
-        margin-top: 8px;
+        padding: 12px 14px;
+        margin-top: 4px;
         color: #e8f4fd;
-        font-size: 1rem;
-        line-height: 1.8;
+        font-size: 0.9rem;
+        line-height: 1.55;
         white-space: pre-wrap;
         font-family: 'Sarabun', sans-serif;
-        box-shadow: 0 0 20px rgba(45, 120, 210, 0.15);
+        box-shadow: 0 0 16px rgba(45, 120, 210, 0.12);
     }
 
-    /* Streamlit widget overrides */
-    .stSelectbox > div > div {
-        background: rgba(255,255,255,0.07) !important;
-        border: 1px solid rgba(255,255,255,0.15) !important;
-        color: #e8f4fd !important;
-        border-radius: 8px !important;
+    label[data-testid="stWidgetLabel"] {
+        color: #a8d4f5 !important;
+        font-weight: 600 !important;
+        font-size: 0.78rem !important;
+        margin-bottom: 2px !important;
     }
 
+    .stSelectbox > div > div,
     .stNumberInput > div > div > input,
     .stTextInput > div > div > input {
         background: rgba(255,255,255,0.07) !important;
         border: 1px solid rgba(255,255,255,0.15) !important;
         color: #e8f4fd !important;
         border-radius: 8px !important;
+        min-height: 2.1rem !important;
+        font-size: 0.86rem !important;
+    }
+
+    div[data-baseweb="select"] > div {
+        min-height: 2.1rem !important;
+    }
+
+    input {
+        padding-top: 0.3rem !important;
+        padding-bottom: 0.3rem !important;
+    }
+
+    .stCheckbox {
+        margin-top: -4px !important;
+        margin-bottom: -4px !important;
     }
 
     .stCheckbox > label {
         color: #c8dff0 !important;
-        font-size: 0.95rem !important;
-    }
-
-    label[data-testid="stWidgetLabel"] {
-        color: #a8d4f5 !important;
-        font-weight: 600 !important;
-        font-size: 0.9rem !important;
+        font-size: 0.84rem !important;
     }
 
     .copy-btn {
         background: linear-gradient(135deg, #1e6fbf, #2a8cde);
         color: white;
         border: none;
-        padding: 10px 28px;
+        padding: 8px 18px;
         border-radius: 8px;
         cursor: pointer;
         font-family: 'Sarabun', sans-serif;
-        font-size: 0.95rem;
+        font-size: 0.86rem;
         font-weight: 600;
-        margin-top: 10px;
+        margin-top: 8px;
         transition: all 0.2s;
+        width: 100%;
     }
 
     .copy-btn:hover {
@@ -134,33 +166,21 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(45, 140, 222, 0.4);
     }
 
-    div[data-testid="stHorizontalBlock"] {
-        gap: 12px;
-    }
-
-    .stButton > button {
-        background: linear-gradient(135deg, #1e6fbf, #2a8cde) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-family: 'Sarabun', sans-serif !important;
-        font-weight: 600 !important;
-        padding: 0.5rem 2rem !important;
-        transition: all 0.2s !important;
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 12px rgba(45, 140, 222, 0.4) !important;
-    }
-
     hr {
+        margin-top: 0.4rem !important;
+        margin-bottom: 0.4rem !important;
         border-color: rgba(255,255,255,0.1) !important;
+    }
+
+    div[data-testid="stExpander"] {
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        border-radius: 8px !important;
+        background: rgba(255,255,255,0.03) !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Date Calculation ──────────────────────────────────────
+# Date Calculation
 today_th = datetime.utcnow() + timedelta(hours=7)
 session_date = today_th - timedelta(days=1)
 
@@ -170,60 +190,63 @@ def thai_date(dt):
 session_date_str = thai_date(session_date)
 today_str = thai_date(today_th)
 
-# ── Header ────────────────────────────────────────────────
+# Header
 st.markdown(f"""
 <div class="header-box">
-    <h1>📋 ฟอร์มแจ้ง Call Margin</h1>
+    <h1>ฟอร์มแจ้ง Call Margin</h1>
     <div class="date-badge">
-        📅 วันที่ Session: <strong>{session_date_str}</strong>
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        วันไทยปัจจุบัน: {today_str}
+        Session: <strong>{session_date_str}</strong>
+        &nbsp;|&nbsp;
+        วันนี้: {today_str}
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ── Form Fields ───────────────────────────────────────────
-st.markdown('<div class="section-card"><div class="section-title">⚙️ ข้อมูล Session</div>', unsafe_allow_html=True)
+# Main Form
+st.markdown('<div class="section-card"><div class="section-title">ข้อมูลหลัก</div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns([1.25, 0.9, 1.1])
+
 with col1:
     session = st.selectbox(
         "Session",
-        options=['ก่อนปิดตลาด', 'เปิดตลาด', 'กลางวัน'],
+        options=["ก่อนปิดตลาด", "เปิดตลาด", "กลางวัน"],
         index=0
     )
+
 with col2:
     currency = st.selectbox(
         "สกุลเงิน",
-        options=['USD', 'THB', 'EUR'],
+        options=["USD", "THB", "EUR"],
         index=0
     )
 
-amount = st.number_input(
-    "จำนวนเงิน",
-    min_value=0.0,
-    value=1500.0,
-    step=100.0,
-    format="%.0f"
-)
+with col3:
+    amount = st.number_input(
+        "จำนวนเงิน",
+        min_value=0.0,
+        value=1500.0,
+        step=100.0,
+        format="%.0f"
+    )
 
-st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<div style="height:4px;"></div>', unsafe_allow_html=True)
 
-# ── Time Period Checkboxes ────────────────────────────────
-st.markdown('<div class="section-card"><div class="section-title">🕐 ช่วงเวลา</div>', unsafe_allow_html=True)
+col_t1, col_t2, col_t3, col_space = st.columns([0.55, 0.65, 0.65, 3])
 
-col_t, col_t1, col_t2, _ = st.columns([1, 1, 1, 3])
-with col_t:
-    t = st.checkbox("T", value=True)
 with col_t1:
-    t1 = st.checkbox("T+1", value=False)
+    t = st.checkbox("T", value=True)
+
 with col_t2:
+    t1 = st.checkbox("T+1", value=False)
+
+with col_t3:
     t2 = st.checkbox("T+2", value=False)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Advisory Fields ───────────────────────────────────────
-st.markdown('<div class="section-card"><div class="section-title">💬 คำแนะนำและหมายเหตุ</div>', unsafe_allow_html=True)
+# Advisory Fields
+st.markdown('<div class="section-card"><div class="section-title">คำแนะนำและหมายเหตุ</div>', unsafe_allow_html=True)
 
 advice = st.text_input(
     "คำแนะนำ",
@@ -238,13 +261,16 @@ remark = st.text_input(
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Generate Message ──────────────────────────────────────
+# Generate Message
 t_labels = []
-if t:  t_labels.append('T')
-if t1: t_labels.append('T+1')
-if t2: t_labels.append('T+2')
+if t:
+    t_labels.append("T")
+if t1:
+    t_labels.append("T+1")
+if t2:
+    t_labels.append("T+2")
 
-t_str = f" เป็นช่วงเวลา {' / '.join(t_labels)}" if t_labels else ''
+t_str = f" เป็นช่วงเวลา {' / '.join(t_labels)}" if t_labels else ""
 amount_fmt = f"{int(amount):,}"
 
 message = (
@@ -253,27 +279,36 @@ message = (
     f"โดยมี Call Margin อยู่ที่ประมาณ {currency} {amount_fmt}{t_str}\n"
     f"{advice}ครับ"
 )
+
 if remark.strip():
     message += f"\n\nหมายเหตุ: {remark.strip()}"
 
-# ── Output ────────────────────────────────────────────────
-st.markdown("---")
-st.markdown('<p style="color:#7db9e8; font-weight:600; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;">📤 ข้อความที่จะส่ง</p>', unsafe_allow_html=True)
-st.markdown(f'<div class="output-box">{message}</div>', unsafe_allow_html=True)
+safe_message_html = html.escape(message)
 
-# Copy button via clipboard API
+safe_message_js = (
+    message
+    .replace("\\", "\\\\")
+    .replace("`", "\\`")
+    .replace("${", "\\${")
+)
+
+# Output
+st.markdown('<div class="output-label">ข้อความที่จะส่ง</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="output-box">{safe_message_html}</div>', unsafe_allow_html=True)
+
 st.markdown(f"""
-<br>
 <button class="copy-btn" onclick="
-    navigator.clipboard.writeText(`{message.replace('`', chr(96))}`).then(() => {{
-        this.textContent = '✅ คัดลอกแล้ว!';
-        setTimeout(() => this.textContent = '📋 คัดลอกข้อความ', 2000);
+    navigator.clipboard.writeText(`{safe_message_js}`).then(() => {{
+        this.textContent = 'คัดลอกแล้ว';
+        setTimeout(() => this.textContent = 'คัดลอกข้อความ', 2000);
     }});
-">📋 คัดลอกข้อความ</button>
+">คัดลอกข้อความ</button>
 """, unsafe_allow_html=True)
 
-# Text area for manual copy fallback
-with st.expander("📝 คัดลอกแบบ manual (กรณีปุ่มด้านบนไม่ทำงาน)"):
-    st.text_area("", value=message, height=130, label_visibility="collapsed")
-
-st.markdown("<br><br>", unsafe_allow_html=True)
+with st.expander("คัดลอกแบบ manual"):
+    st.text_area(
+        "",
+        value=message,
+        height=100,
+        label_visibility="collapsed"
+    )
